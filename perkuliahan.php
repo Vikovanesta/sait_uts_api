@@ -6,7 +6,8 @@ switch ($request_method) {
          if(!empty($_GET["nim"]))
          {
             $nim=$_GET["nim"];
-            get_nilai($nim);
+            $kode_mk=$_GET["kode_mk"];
+            get_nilai($nim, $kode_mk);
          }
          else
          {
@@ -56,13 +57,17 @@ switch ($request_method) {
       echo json_encode($response);
    }
  
-   function get_nilai($id)
+   function get_nilai($id, $kode_mk=0)
    {
       global $mysqli;
       $query="SELECT mahasiswa.*, matakuliah.*, perkuliahan.nilai FROM mahasiswa JOIN perkuliahan ON mahasiswa.nim = perkuliahan.nim JOIN matakuliah ON perkuliahan.kode_mk = matakuliah.kode_mk";
       if($id != 0)
       {
          $query.=" WHERE mahasiswa.nim LIKE '$id'";
+      }
+      if($kode_mk != 0)
+      {
+         $query.=" AND matakuliah.kode_mk LIKE '$kode_mk'";
       }
       $data=array();
       $result=$mysqli->query($query);
@@ -134,7 +139,6 @@ switch ($request_method) {
          $arrcheckpost = array('nilai' => '');
          $hitung = count(array_intersect_key($data, $arrcheckpost));
          if($hitung == count($arrcheckpost)){
-          
               $result = mysqli_query($mysqli, "UPDATE perkuliahan SET
               nilai = '$data[nilai]'
               WHERE nim='$nim' AND kode_mk='$kode_mk'");
